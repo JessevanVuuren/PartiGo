@@ -61,8 +61,8 @@ func collision(particles []Particle) {
 					norm := vec3_divide_f(vec, length)
 					delta := particles[i].radius + particles[j].radius - length
 					norm = rl.Vector2Scale(norm, delta)
-					particles[i].pos = rl.Vector2Add(particles[i].pos, norm)
-					particles[j].pos = rl.Vector2Subtract(particles[j].pos, norm)
+					// particles[i].pos = rl.Vector2Add(particles[i].pos, norm)
+					// particles[j].pos = rl.Vector2Subtract(particles[j].pos, norm)
 
 				}
 			}
