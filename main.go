@@ -1,6 +1,8 @@
 package main
 
 import (
+	"strconv"
+
 	rl "github.com/gen2brain/raylib-go/raylib"
 )
 
@@ -47,10 +49,6 @@ func word_box(particles []Particle) {
 	}
 }
 
-func vec3_divide_f(v rl.Vector2, l float32) rl.Vector2 {
-	return rl.Vector2{X: v.X / l, Y: v.Y / 2}
-}
-
 func collision(particles []Particle) {
 	for i := 0; i < len(particles); i++ {
 		for j := 0; j < len(particles); j++ {
@@ -58,27 +56,15 @@ func collision(particles []Particle) {
 				vec := rl.Vector2Subtract(particles[i].pos, particles[j].pos)
 				length := rl.Vector2Length(vec)
 				if length < particles[i].radius+particles[j].radius {
-					norm := vec3_divide_f(vec, length)
+					norm := rl.Vector2Scale(vec, 1/length)
 					delta := particles[i].radius + particles[j].radius - length
-					norm = rl.Vector2Scale(norm, delta)
-					// particles[i].pos = rl.Vector2Add(particles[i].pos, norm)
-					// particles[j].pos = rl.Vector2Subtract(particles[j].pos, norm)
 
+					adjustment := rl.Vector2Scale(norm, delta/2)
+					particles[i].pos = rl.Vector2Add(particles[i].pos, adjustment)
+					particles[j].pos = rl.Vector2Subtract(particles[j].pos, adjustment)
 				}
 			}
 		}
-
-		// mfloat_t axis[VEC3_SIZE];
-		// vec3_subtract(axis, a->current, b->current);
-		// mfloat_t dist = vec3_length(axis);
-		// if (dist < a->radius + b->radius) {
-		// 	mfloat_t norm[VEC3_SIZE];
-		// 	vec3_divide_f(norm, axis, dist);
-		// 	mfloat_t delta = a->radius + b->radius - dist;
-		// 	vec3_multiply_f(norm, norm, 0.5 * delta);
-		// 	vec3_add(a->current, a->current, norm);
-		// 	vec3_subtract(b->current, b->current, norm);
-		// }
 	}
 }
 
@@ -103,7 +89,7 @@ func main() {
 
 	for !rl.WindowShouldClose() {
 
-		if rl.IsMouseButtonPressed(rl.MouseButtonLeft) {
+		if rl.IsMouseButtonDown(rl.MouseButtonLeft) {
 			particles = append(particles, Particle{
 				old:    rl.Vector2{X: 200, Y: 200},
 				pos:    rl.Vector2{X: 200, Y: 200},
@@ -126,7 +112,8 @@ func main() {
 
 		render_particle(particles)
 		rl.ClearBackground(rl.GetColor(0x181818FF))
-
+		rl.DrawText("PartiGos: "+strconv.Itoa(len(particles)), 5, 5, 20, rl.GetColor(0xFFFFFFFF))
+		rl.DrawFPS(5, 30)
 		rl.EndDrawing()
 	}
 }
