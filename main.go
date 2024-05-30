@@ -22,9 +22,15 @@ type Particle struct {
 	color  rl.Color
 }
 
-func render_particle(particles []Particle) {
+func render_particle(particles []Particle, texture rl.Texture2D) {
 	for i := 0; i < len(particles); i++ {
-		rl.DrawCircle(int32(particles[i].pos.X), int32(particles[i].pos.Y), particles[i].radius, particles[i].color)
+		sourceRec := rl.Rectangle{X: 0.0, Y: 0.0, Width: float32(texture.Width), Height: float32(texture.Height)}
+		destRec := rl.Rectangle{X: particles[i].pos.X, Y: particles[i].pos.Y, Width: float32(texture.Width) * .04, Height: float32(texture.Width) * .04}
+		origin := rl.Vector2{X: float32(texture.Width) / 2 * .04, Y: float32(texture.Height) / 2 * .04}
+
+		// rl.DrawTexture(texture, int32(particles[i].pos.X), int32(particles[i].pos.Y), rl.GetColor(0xFFFFFFFF))
+		rl.DrawTexturePro(texture, sourceRec, destRec, origin, 0, rl.GetColor(0xFFFFFFFF))
+		// rl.DrawCircle(int32(particles[i].pos.X), int32(particles[i].pos.Y), particles[i].radius, particles[i].color)
 	}
 }
 
@@ -85,6 +91,8 @@ func main() {
 	rl.InitWindow(WIDTH, HEIGHT, "PartiGo")
 	rl.SetTargetFPS(60)
 
+	var tex = rl.LoadTextureFromImage(rl.LoadImage("./ball.png"))
+
 	particles := []Particle{}
 
 	for !rl.WindowShouldClose() {
@@ -110,7 +118,7 @@ func main() {
 
 		rl.DrawCircle(WIDTH/2, HEIGHT/2, WORLD_SIZE, rl.GetColor(0x101010FF))
 
-		render_particle(particles)
+		render_particle(particles, tex)
 		rl.ClearBackground(rl.GetColor(0x181818FF))
 		rl.DrawText("PartiGos: "+strconv.Itoa(len(particles)), 5, 5, 20, rl.GetColor(0xFFFFFFFF))
 		rl.DrawFPS(5, 30)
